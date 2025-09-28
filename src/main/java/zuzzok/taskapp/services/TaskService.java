@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import zuzzok.taskapp.exceptions.ResourceNotFoundException;
 import zuzzok.taskapp.models.Task;
 import zuzzok.taskapp.models.TaskStatus;
 import zuzzok.taskapp.payloads.TaskRequest;
@@ -25,8 +26,8 @@ public class TaskService {
 
   public Task getTaskById(Long id) {
     return taskRepository.findById(id).orElseThrow(
-      () -> new RuntimeException("Task not found")
-    ); // TODO: Reemplazar con excepción personalizada
+      () -> new ResourceNotFoundException("Task not found with id: " + id)
+    );
   }
 
   @Transactional
@@ -43,8 +44,8 @@ public class TaskService {
   @Transactional
   public Task updateTask(Long id, TaskUpdateRequest request) {
     var task = taskRepository.findById(id).orElseThrow(
-      () -> new RuntimeException("Task not found")
-    ); // TODO: Reemplazar con excepción personalizada
+      () -> new ResourceNotFoundException("Task not found with id: " + id)
+    );
 
     task.setTitle(request.getTitle());
     task.setDescription(request.getDescription());
@@ -57,8 +58,8 @@ public class TaskService {
   @Transactional
   public void deleteTask(Long id) {
     var task = taskRepository.findById(id).orElseThrow(
-      () -> new RuntimeException("Task not found with id " + id)
-    ); // TODO: Reemplazar con excepción personalizada
+      () -> new ResourceNotFoundException("Task not found with id: " + id)
+    );
 
     taskRepository.delete(task);
   }
