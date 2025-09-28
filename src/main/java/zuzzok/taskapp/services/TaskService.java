@@ -42,7 +42,6 @@ public class TaskService {
 
   @Transactional
   public Task updateTask(Long id, TaskUpdateRequest request) {
-    
     var task = taskRepository.findById(id).orElseThrow(
       () -> new RuntimeException("Task not found")
     ); // TODO: Reemplazar con excepción personalizada
@@ -53,7 +52,15 @@ public class TaskService {
     task.setUpdatedAt(LocalDateTime.now());
     
     return task;
+  }
 
+  @Transactional
+  public void deleteTask(Long id) {
+    var task = taskRepository.findById(id).orElseThrow(
+      () -> new RuntimeException("Task not found with id " + id)
+    ); // TODO: Reemplazar con excepción personalizada
+
+    taskRepository.delete(task);
   }
 
 }
