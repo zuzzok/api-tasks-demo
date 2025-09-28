@@ -12,8 +12,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,11 +29,10 @@ public class Task {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Size(max = 100, message = "Title cannot be longer than 100 characters")
-  @NotBlank(message = "Title is mandatory")
+  @Column(nullable = false, length = 100)
   private String title;
 
-  @Size(max = 500, message = "Description cannot be longer than 500 characters")
+  @Column(length = 500)
   private String description;
 
   @Enumerated(EnumType.STRING)
