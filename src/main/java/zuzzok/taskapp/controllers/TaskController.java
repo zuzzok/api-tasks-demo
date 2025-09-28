@@ -2,7 +2,6 @@ package zuzzok.taskapp.controllers;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,10 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import zuzzok.taskapp.payloads.ApiResponse;
 import zuzzok.taskapp.payloads.TaskRequest;
 import zuzzok.taskapp.payloads.TaskResponse;
 import zuzzok.taskapp.payloads.TaskUpdateRequest;
 import zuzzok.taskapp.services.TaskService;
+import zuzzok.taskapp.utils.ResponseHelper;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -32,37 +34,33 @@ public class TaskController {
   private final TaskService taskService;
   
   @GetMapping("/tasks")
-  public ResponseEntity<List<TaskResponse>> getAllTasks() {
-    return ResponseEntity.ok(
-      taskService.getAllTasks()
-        .stream()
-        .map(TaskResponse::fromEntity)
-        .toList()
-    );
+  public ResponseEntity<ApiResponse<List<TaskResponse>>> getAllTasks() {
+    var tasks = taskService.getAllTasks().stream().map(TaskResponse::fromEntity).toList();
+    return ResponseHelper.ok(tasks, "Tasks retrieved successfully");
   }
 
   @GetMapping("/tasks/{id}")
-  public ResponseEntity<TaskResponse> getTaskById(@PathVariable Long id) {
+  public ResponseEntity<ApiResponse<TaskResponse>> getTaskById(@PathVariable Long id) {
     var task = taskService.getTaskById(id);
-    return ResponseEntity.ok(TaskResponse.fromEntity(task));
+    return ResponseHelper.ok(TaskResponse.fromEntity(task), "Task retrieved successfully");
   }
 
   @PostMapping("/tasks")
-  public ResponseEntity<TaskResponse> createTask(@RequestBody @Valid TaskRequest request) {
+  public ResponseEntity<ApiResponse<TaskResponse>> createTask(@RequestBody @Valid TaskRequest request) {
     var task = taskService.createTask(request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(TaskResponse.fromEntity(task));
+    return ResponseHelper.created(TaskResponse.fromEntity(task), "Task created successfully");
   }
   
   @PutMapping("/tasks/{id}")
-  public ResponseEntity<TaskResponse> updateTask(@PathVariable Long id, @RequestBody TaskUpdateRequest request) {
+  public ResponseEntity<ApiResponse<TaskResponse>> updateTask(@PathVariable Long id, @RequestBody TaskUpdateRequest request) {
     var task = taskService.updateTask(id, request);
-    return ResponseEntity.status(HttpStatus.OK).body(TaskResponse.fromEntity(task));
+    return ResponseHelper.ok(TaskResponse.fromEntity(task), "Task updated successfully");
   }
 
   @DeleteMapping("/tasks/{id}")
-  public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
+  public ResponseEntity<ApiResponse<Void>> deleteTask(@PathVariable Long id) {
     taskService.deleteTask(id);
-    return ResponseEntity.noContent().build();
+    return ResponseHelper.noContent("Task deleted successfully");
   }
 
 }
